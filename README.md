@@ -4,3 +4,5 @@
 
 Готовый вариант программы расположен [здесь](https://github.com/Timoty02/trend_analyzer/releases).
 Запуск программы осуществляется через командную строку командой  *java -jar trend_analyzer.jar*
+
+P.S. версия Java 21.
