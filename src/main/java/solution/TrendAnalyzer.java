@@ -34,9 +34,35 @@ public class TrendAnalyzer {
     public void generateTrends() {
         trend1.clear();
         trend2.clear();
-        for (int i = 0; i < count; i++) {
-            trend1.add((int) (Math.random() * (maxRange - minRange + 1)) + minRange);
-            trend2.add((int) (Math.random() * (maxRange - minRange + 1)) + minRange);
+        generateRandomTrend(trend1);
+        generateRandomTrend(trend2);
+    }
+    public void generateRandomTrend(List<Integer> trend) {
+        int current = minRange + (int)(Math.random() * (maxRange - minRange));
+        trend.add(current);
+        int range = maxRange - minRange;
+        for (int i = 1; i < count; i++) {
+            double positionFactor = 1.0 - Math.abs(2.0 * (current - minRange) / range - 1.0);
+            positionFactor = 0.3 + 0.7 * positionFactor; // От 30% до 100%
+            double baseSmallChange = 0.03 * positionFactor;
+            double baseJump = 0.2 * positionFactor;
+            if (Math.random() < 0.05) {
+                int jump = (int)(Math.random() * baseJump * range) + 1;
+                current += (Math.random() < 0.5 ? -1 : 1) * jump;
+            } else {
+                int smallChange = (int)(Math.random() * baseSmallChange * range) + 1;
+                current += (Math.random() < 0.5 ? -1 : 1) * smallChange;
+            }
+            double distanceToMin = (double)(current - minRange) / range;
+            double distanceToMax = (double)(maxRange - current) / range;
+
+            if (distanceToMin < 0.1) {
+                if (Math.random() < 0.7) current += Math.max(1, range / 100);
+            } else if (distanceToMax < 0.1) {
+                if (Math.random() < 0.7) current -= Math.max(1, range / 100);
+            }
+            current = Math.max(minRange, Math.min(maxRange, current));
+            trend.add(current);
         }
     }
     public List<Integer> getTrend1() {
