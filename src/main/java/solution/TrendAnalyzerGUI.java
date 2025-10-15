@@ -13,6 +13,7 @@ public class TrendAnalyzerGUI extends JFrame {
     private JTextArea trend2Area;
     private JTextField minField;
     private JTextField maxField;
+    private JTextField countField;
 
 
     public TrendAnalyzerGUI() {
@@ -44,8 +45,10 @@ public class TrendAnalyzerGUI extends JFrame {
         JButton checkButton = new JButton("Проверить стабильность");
         buttonPanel.add(generateButton);
         buttonPanel.add(checkButton);
-        generateButton.addActionListener(new GenerateButtonListener());
-        checkButton.addActionListener(new CheckButtonListener());
+        GenerateButtonListener generateButtonListener = new GenerateButtonListener();
+        generateButton.addActionListener(generateButtonListener);
+        CheckButtonListener checkButtonListener = new CheckButtonListener();
+        checkButton.addActionListener(checkButtonListener);
         JMenuBar menuBar = new JMenuBar();
         JMenu settingsMenu = new JMenu("Настройки");
         JMenuItem rangeItem = new JMenuItem("Задать границы");
@@ -56,6 +59,7 @@ public class TrendAnalyzerGUI extends JFrame {
         add(inputPanel, BorderLayout.NORTH);
         add(trendsPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
+        generateButtonListener.actionPerformed(null);
     }
 
     private class GenerateButtonListener implements ActionListener {
@@ -72,8 +76,8 @@ public class TrendAnalyzerGUI extends JFrame {
             List<Integer> trend1 = trendAnalyzer.getTrend1();
             List<Integer> trend2 = trendAnalyzer.getTrend2();
             for (int i = 0; i < trend1.size(); i++) {
-                trend1Area.append(trend1.get(i) + "\n");
-                trend2Area.append(trend2.get(i) + "\n");
+                trend1Area.append(i + ": " + trend1.get(i) + "\n");
+                trend2Area.append(i + ": " + trend2.get(i) + "\n");
             }
         }
     }
@@ -86,11 +90,18 @@ public class TrendAnalyzerGUI extends JFrame {
                 trendAnalyzer.setN(n);
                 int result1 = trendAnalyzer.analyzeTrend1();
                 int result2 = trendAnalyzer.analyzeTrend2();
-                if (result1 == -1 & result2 == -1) {
-                    JOptionPane.showMessageDialog(null, "Тренды стабильны");
+                StringBuilder message = new StringBuilder();
+                if (result1 == -1) {
+                    message.append("Тренд 1 стабильный\n");
                 } else {
-                    JOptionPane.showMessageDialog(null, "Тренды не стабильны");
+                    message.append("Тренд 1 не стабильный, стабильность нарушена на ").append(result1).append(" измерении\n");
                 }
+                if (result2 == -1) {
+                    message.append("Тренд 2 стабильный\n");
+                } else {
+                    message.append("Тренд 2 не стабильный, стабильность нарушена на ").append(result2).append(" измерении\n");
+                }
+                JOptionPane.showMessageDialog(null, message.toString());
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(null, "Введите корректное значение n!");
             }
@@ -109,7 +120,8 @@ public class TrendAnalyzerGUI extends JFrame {
             maxField = new JTextField(String.valueOf(trendAnalyzer.getMaxRange()));
             rangeDialog.add(maxField);
             rangeDialog.add(new JLabel("Количество измерений:"));
-            rangeDialog.add(new JTextField(String.valueOf(trendAnalyzer.getCount())));
+            countField = new JTextField(String.valueOf(trendAnalyzer.getCount()));
+            rangeDialog.add(countField);
             JButton saveButton = new JButton("Сохранить");
             saveButton.addActionListener(ev -> {
                 try {
